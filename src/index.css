@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -51,8 +51,8 @@
     --gold: 37 33% 60%;
     --section-gap: 300px;
 
-    --font-heading: 'Cormorant Garamond', serif;
-    --font-body: 'Inter', sans-serif;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Montserrat', sans-serif;
   }
 }
 

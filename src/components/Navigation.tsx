@@ -1,117 +1,133 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useCartContext } from '@/contexts/CartContext';
 
-interface NavigationProps {
-  cartCount?: number;
-}
-
-const Navigation = ({ cartCount = 0 }: NavigationProps) => {
+const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { count } = useCartContext();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > window.innerHeight * 0.8);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // On non-home pages, always show monogram
-  const isHome = location.pathname === '/';
-  const showMonogram = !isHome || scrolled;
-
-  const navItems = [
-    { label: 'MAISON CROWNED', action: () => { navigate('/'); setMenuOpen(false); } },
-    { label: 'COLEÇÃO MASCULINA', action: () => { navigate('/colecao/masculina'); setMenuOpen(false); } },
-    { label: 'COLEÇÃO FEMININA', action: () => { navigate('/colecao/feminina'); setMenuOpen(false); } },
-    { label: `CARRINHO${cartCount > 0 ? ` (${cartCount})` : ''}`, action: () => { navigate('/carrinho'); setMenuOpen(false); } },
-  ];
+  const go = (path: string) => {
+    navigate(path);
+    setMenuOpen(false);
+  };
 
   return (
     <>
-      <AnimatePresence mode="wait">
-        {!showMonogram ? (
-          <motion.nav
-            key="full-nav"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-            className="fixed top-0 left-0 z-50 p-8 md:p-12"
+      {/* Sticky glassmorphism navbar */}
+      <motion.nav
+        initial={{ y: -80 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6 }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? 'bg-background/60 backdrop-blur-xl border-b border-border/30'
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
+          {/* Left: Login */}
+          <button
+            onClick={() => go('/login')}
+            className="font-body text-[10px] tracking-[0.3em] text-foreground/60 gold-hover"
           >
-            <div className="flex flex-col gap-1.5">
-              {navItems.map((item, i) => (
-                <button
-                  key={item.label}
-                  onClick={item.action}
-                  className="text-left font-body text-xs tracking-[0.2em] text-foreground/70 gold-hover"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </motion.nav>
-        ) : (
-          <motion.button
-            key="monogram"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.4 }}
-            onClick={() => setMenuOpen(true)}
-            className="fixed top-6 left-6 md:top-8 md:left-8 z-50 font-heading text-2xl tracking-[0.2em] text-foreground/80 gold-hover"
-          >
-            MC
-          </motion.button>
-        )}
-      </AnimatePresence>
+            LOGIN
+          </button>
 
-      {/* Full-screen overlay menu */}
+          {/* Center: Brand */}
+          <button
+            onClick={() => go('/')}
+            className="font-heading text-lg md:text-xl tracking-[0.25em] text-foreground gold-hover"
+          >
+            MAISON CROWNED
+          </button>
+
+          {/* Right: Cart */}
+          <button
+            onClick={() => go('/carrinho')}
+            className="font-body text-[10px] tracking-[0.3em] text-foreground/60 gold-hover relative"
+          >
+            CART
+            {count > 0 && (
+              <span className="absolute -top-1 -right-4 w-4 h-4 bg-gold text-primary-foreground text-[8px] flex items-center justify-center">
+                {count}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Sub-nav for collections - visible on scroll */}
+        <AnimatePresence>
+          {scrolled && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden border-t border-border/20"
+            >
+              <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-center gap-12 h-10">
+                {[
+                  { label: 'MASCULINA', path: '/colecao/masculina' },
+                  { label: 'FEMININA', path: '/colecao/feminina' },
+                ].map(item => (
+                  <button
+                    key={item.label}
+                    onClick={() => go(item.path)}
+                    className={`font-body text-[9px] tracking-[0.3em] gold-hover transition-colors ${
+                      location.pathname === item.path ? 'text-gold' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
+
+      {/* Mobile menu overlay */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="fixed inset-0 z-[100] bg-background/98 flex items-center justify-center"
+            className="fixed inset-0 z-[100] bg-background/98 backdrop-blur-xl flex items-center justify-center"
             onClick={() => setMenuOpen(false)}
           >
-            <motion.div
-              initial={{ y: 40, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 40, opacity: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex flex-col items-center gap-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {navItems.map((item, i) => (
-                <motion.button
-                  key={item.label}
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.15 + i * 0.08 }}
-                  onClick={item.action}
-                  className="font-heading text-2xl md:text-4xl tracking-[0.15em] text-foreground/80 gold-hover"
-                >
-                  {item.label}
-                </motion.button>
-              ))}
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
+            <div className="flex flex-col items-center gap-8" onClick={e => e.stopPropagation()}>
+              {['/', '/colecao/masculina', '/colecao/feminina', '/carrinho'].map((path, i) => {
+                const labels = ['MAISON CROWNED', 'COLEÇÃO MASCULINA', 'COLEÇÃO FEMININA', `CARRINHO${count > 0 ? ` (${count})` : ''}`];
+                return (
+                  <motion.button
+                    key={path}
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 + i * 0.08 }}
+                    onClick={() => go(path)}
+                    className="font-heading text-2xl md:text-4xl tracking-[0.15em] text-foreground/80 gold-hover"
+                  >
+                    {labels[i]}
+                  </motion.button>
+                );
+              })}
+              <button
                 onClick={() => setMenuOpen(false)}
                 className="mt-12 font-body text-xs tracking-[0.3em] text-muted-foreground gold-hover"
               >
                 FECHAR
-              </motion.button>
-            </motion.div>
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
