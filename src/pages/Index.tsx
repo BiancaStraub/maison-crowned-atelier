@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import HeroSection from '@/components/HeroSection';
+import FabricsSection from '@/components/FabricsSection';
 import Footer from '@/components/Footer';
 
 const Index = () => {
@@ -53,6 +54,9 @@ const Index = () => {
           ))}
         </div>
       </section>
+
+      {/* Tecidos Nobres */}
+      <FabricsSection />
 
       {/* Statement */}
       <section className="py-section px-6">
