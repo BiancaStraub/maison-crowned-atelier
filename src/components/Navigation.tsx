@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCartContext } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -9,6 +10,7 @@ const Navigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { count } = useCartContext();
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
@@ -23,7 +25,6 @@ const Navigation = () => {
 
   return (
     <>
-      {/* Sticky glassmorphism navbar */}
       <motion.nav
         initial={{ y: -80 }}
         animate={{ y: 0 }}
@@ -35,12 +36,12 @@ const Navigation = () => {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
-          {/* Left: Login */}
+          {/* Left: User icon / Login */}
           <button
-            onClick={() => go('/login')}
+            onClick={() => go(user ? '/dashboard' : '/login')}
             className="font-body text-[10px] tracking-[0.3em] text-foreground/60 gold-hover"
           >
-            LOGIN
+            {user ? 'CONTA' : 'LOGIN'}
           </button>
 
           {/* Center: Brand */}
@@ -65,7 +66,6 @@ const Navigation = () => {
           </button>
         </div>
 
-        {/* Sub-nav for collections - visible on scroll */}
         <AnimatePresence>
           {scrolled && (
             <motion.div
@@ -95,7 +95,6 @@ const Navigation = () => {
         </AnimatePresence>
       </motion.nav>
 
-      {/* Mobile menu overlay */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { products, formatPrice } from '@/data/products';
 import { useCartContext } from '@/contexts/CartContext';
 import MeasurementForm from '@/components/MeasurementForm';
+import ProductReviews from '@/components/ProductReviews';
 import { toast } from 'sonner';
 
 const ProductDetail = () => {
@@ -65,83 +66,72 @@ const ProductDetail = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8 }}
-            className="min-h-screen flex flex-col lg:flex-row"
           >
-            <div className="w-full lg:w-1/2 h-[60vh] lg:h-screen flex items-center justify-center bg-secondary/50">
-              <div className={`w-72 h-[420px] md:w-96 md:h-[560px] bg-gradient-to-b ${getGradient(product.color)} flex items-center justify-center`}>
-                <span className="font-heading text-8xl tracking-[0.1em] text-foreground/8 select-none">
-                  {product.name.charAt(0)}
-                </span>
+            <div className="min-h-screen flex flex-col lg:flex-row">
+              <div className="w-full lg:w-1/2 h-[60vh] lg:h-screen flex items-center justify-center bg-secondary/50">
+                <div className={`w-72 h-[420px] md:w-96 md:h-[560px] bg-gradient-to-b ${getGradient(product.color)} flex items-center justify-center`}>
+                  <span className="font-heading text-8xl tracking-[0.1em] text-foreground/8 select-none">
+                    {product.name.charAt(0)}
+                  </span>
+                </div>
               </div>
-            </div>
 
-            <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-16 lg:py-0">
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                onClick={() => navigate(-1)}
-                className="font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover mb-12 self-start"
-              >
-                ← VOLTAR
-              </motion.button>
-
-              <motion.span
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="font-body text-[10px] tracking-[0.4em] text-muted-foreground"
-              >
-                {product.collection === 'masculina' ? 'COLEÇÃO MASCULINA' : 'COLEÇÃO FEMININA'}
-              </motion.span>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="font-heading text-5xl md:text-6xl tracking-[0.15em] text-foreground mt-4"
-              >
-                {product.name}
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="font-heading text-xl tracking-[0.1em] text-foreground/50 mt-2"
-              >
-                {product.subtitle}
-              </motion.p>
-
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-8 w-12 h-px bg-border" />
-
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="font-body text-sm text-muted-foreground leading-relaxed mt-8 max-w-md">
-                {product.description}
-              </motion.p>
-
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="mt-6 flex gap-6">
-                <span className="font-body text-[10px] tracking-[0.2em] text-muted-foreground">{product.fabric}</span>
-                <span className="font-body text-[10px] tracking-[0.2em] text-muted-foreground">{product.color}</span>
-              </motion.div>
-
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="font-body text-lg tracking-[0.15em] text-gold mt-8">
-                {formatPrice(product.price)}
-              </motion.p>
-
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 }} className="mt-12 flex flex-col gap-4">
-                <button
-                  onClick={() => setShowMeasurements(true)}
-                  className="font-body text-xs tracking-[0.3em] text-foreground/70 border-b border-foreground/20 pb-2 self-start gold-hover transition-colors"
+              <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-16 lg:py-0">
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  onClick={() => navigate(-1)}
+                  className="font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover mb-12 self-start"
                 >
-                  PERSONALIZAR MEDIDAS
-                </button>
-                <button
-                  onClick={handleAddToCart}
-                  className="font-body text-xs tracking-[0.3em] text-foreground/70 border-b border-foreground/20 pb-2 self-start gold-hover transition-colors"
-                >
-                  ADICIONAR AO CARRINHO
-                </button>
-              </motion.div>
+                  ← VOLTAR
+                </motion.button>
+
+                <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="font-body text-[10px] tracking-[0.4em] text-muted-foreground">
+                  {product.collection === 'masculina' ? 'COLEÇÃO MASCULINA' : 'COLEÇÃO FEMININA'}
+                </motion.span>
+
+                <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="font-heading text-5xl md:text-6xl tracking-[0.15em] text-foreground mt-4">
+                  {product.name}
+                </motion.h1>
+
+                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="font-heading text-xl tracking-[0.1em] text-foreground/50 mt-2">
+                  {product.subtitle}
+                </motion.p>
+
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-8 w-12 h-px bg-border" />
+
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="font-body text-sm text-muted-foreground leading-relaxed mt-8 max-w-md">
+                  {product.description}
+                </motion.p>
+
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="mt-6 flex gap-6">
+                  <span className="font-body text-[10px] tracking-[0.2em] text-muted-foreground">{product.fabric}</span>
+                  <span className="font-body text-[10px] tracking-[0.2em] text-muted-foreground">{product.color}</span>
+                </motion.div>
+
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="font-body text-lg tracking-[0.15em] text-gold mt-8">
+                  {formatPrice(product.price)}
+                </motion.p>
+
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 }} className="mt-12 flex flex-col gap-4">
+                  <button
+                    onClick={() => setShowMeasurements(true)}
+                    className="font-body text-xs tracking-[0.3em] text-foreground/70 border-b border-foreground/20 pb-2 self-start gold-hover transition-colors"
+                  >
+                    PERSONALIZAR MEDIDAS
+                  </button>
+                  <button
+                    onClick={handleAddToCart}
+                    className="font-body text-xs tracking-[0.3em] text-foreground/70 border-b border-foreground/20 pb-2 self-start gold-hover transition-colors"
+                  >
+                    ADICIONAR AO CARRINHO
+                  </button>
+                </motion.div>
+
+                {/* Reviews Section */}
+                <ProductReviews productId={product.id} />
+              </div>
             </div>
           </motion.div>
         ) : (
