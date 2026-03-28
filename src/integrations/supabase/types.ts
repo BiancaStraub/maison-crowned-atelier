@@ -14,6 +14,132 @@ export type Database = {
   }
   public: {
     Tables: {
+      addresses: {
+        Row: {
+          city: string
+          country: string
+          created_at: string
+          id: string
+          label: string | null
+          state: string
+          street: string
+          user_id: string
+          zip: string
+        }
+        Insert: {
+          city: string
+          country?: string
+          created_at?: string
+          id?: string
+          label?: string | null
+          state: string
+          street: string
+          user_id: string
+          zip: string
+        }
+        Update: {
+          city?: string
+          country?: string
+          created_at?: string
+          id?: string
+          label?: string | null
+          state?: string
+          street?: string
+          user_id?: string
+          zip?: string
+        }
+        Relationships: []
+      }
+      employees: {
+        Row: {
+          cargo: string
+          cpf: string | null
+          created_at: string
+          id: string
+          nome: string
+        }
+        Insert: {
+          cargo: string
+          cpf?: string | null
+          created_at?: string
+          id?: string
+          nome: string
+        }
+        Update: {
+          cargo?: string
+          cpf?: string | null
+          created_at?: string
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          description: string
+          id: string
+        }
+        Insert: {
+          amount: number
+          category?: string
+          created_at?: string
+          description: string
+          id?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      measurements: {
+        Row: {
+          altura: string | null
+          busto: string | null
+          cintura: string | null
+          created_at: string
+          id: string
+          label: string
+          manga: string | null
+          ombro: string | null
+          pescoco: string | null
+          quadril: string | null
+          user_id: string
+        }
+        Insert: {
+          altura?: string | null
+          busto?: string | null
+          cintura?: string | null
+          created_at?: string
+          id?: string
+          label?: string
+          manga?: string | null
+          ombro?: string | null
+          pescoco?: string | null
+          quadril?: string | null
+          user_id: string
+        }
+        Update: {
+          altura?: string | null
+          busto?: string | null
+          cintura?: string | null
+          created_at?: string
+          id?: string
+          label?: string
+          manga?: string | null
+          ombro?: string | null
+          pescoco?: string | null
+          quadril?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -90,6 +216,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          cpf: string | null
           created_at: string
           full_name: string | null
           id: string
@@ -98,6 +225,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cpf?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
@@ -106,6 +234,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cpf?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
@@ -147,28 +276,37 @@ export type Database = {
       }
       suppliers: {
         Row: {
+          cnpj: string | null
           contact: string | null
           created_at: string
+          email: string | null
           fabric_type: string
           id: string
           name: string
           notes: string | null
+          telefone: string | null
         }
         Insert: {
+          cnpj?: string | null
           contact?: string | null
           created_at?: string
+          email?: string | null
           fabric_type: string
           id?: string
           name: string
           notes?: string | null
+          telefone?: string | null
         }
         Update: {
+          cnpj?: string | null
           contact?: string | null
           created_at?: string
+          email?: string | null
           fabric_type?: string
           id?: string
           name?: string
           notes?: string | null
+          telefone?: string | null
         }
         Relationships: []
       }
