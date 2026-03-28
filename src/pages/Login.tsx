@@ -37,23 +37,11 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="mt-12 flex flex-col gap-6">
           <div>
             <label className="font-body text-[10px] tracking-[0.3em] text-muted-foreground">E-MAIL</label>
-            <input
-              type="email"
-              required
-              className="measure-input w-full mt-1"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
+            <input type="email" required className="measure-input w-full mt-1" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
           <div>
             <label className="font-body text-[10px] tracking-[0.3em] text-muted-foreground">SENHA</label>
-            <input
-              type="password"
-              required
-              className="measure-input w-full mt-1"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
+            <input type="password" required className="measure-input w-full mt-1" value={password} onChange={e => setPassword(e.target.value)} />
           </div>
           <button
             type="submit"

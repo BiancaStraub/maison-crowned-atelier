@@ -7,9 +7,19 @@ import { toast } from 'sonner';
 const SignUp = () => {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
+  const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const formatCpf = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    return digits
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,14 +27,18 @@ const SignUp = () => {
       toast.error('A senha deve ter pelo menos 6 caracteres');
       return;
     }
+    if (password !== confirmPassword) {
+      toast.error('As senhas não coincidem');
+      return;
+    }
     setLoading(true);
-    const { error } = await signUp(email, password, fullName);
+    const { error } = await signUp(email, password, fullName, cpf.replace(/\D/g, ''));
     setLoading(false);
     if (error) {
       toast.error('Erro ao criar conta', { description: error.message });
     } else {
-      toast.success('Conta criada com sucesso!', { description: 'Verifique seu e-mail para confirmar.' });
-      navigate('/dashboard');
+      toast.success('Conta criada com sucesso!', { description: 'Faça login para continuar.' });
+      navigate('/login');
     }
   };
 
@@ -39,37 +53,26 @@ const SignUp = () => {
         <h1 className="font-heading text-4xl tracking-[0.2em] text-foreground text-center">CRIAR CONTA</h1>
         <div className="mt-4 w-12 h-px bg-gold mx-auto" />
 
-        <form onSubmit={handleSubmit} className="mt-12 flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="mt-12 flex flex-col gap-5">
           <div>
             <label className="font-body text-[10px] tracking-[0.3em] text-muted-foreground">NOME COMPLETO</label>
-            <input
-              type="text"
-              required
-              className="measure-input w-full mt-1"
-              value={fullName}
-              onChange={e => setFullName(e.target.value)}
-            />
+            <input type="text" required className="measure-input w-full mt-1" value={fullName} onChange={e => setFullName(e.target.value)} />
+          </div>
+          <div>
+            <label className="font-body text-[10px] tracking-[0.3em] text-muted-foreground">CPF</label>
+            <input type="text" required className="measure-input w-full mt-1" value={cpf} onChange={e => setCpf(formatCpf(e.target.value))} placeholder="000.000.000-00" />
           </div>
           <div>
             <label className="font-body text-[10px] tracking-[0.3em] text-muted-foreground">E-MAIL</label>
-            <input
-              type="email"
-              required
-              className="measure-input w-full mt-1"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
+            <input type="email" required className="measure-input w-full mt-1" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
           <div>
             <label className="font-body text-[10px] tracking-[0.3em] text-muted-foreground">SENHA</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              className="measure-input w-full mt-1"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
+            <input type="password" required minLength={6} className="measure-input w-full mt-1" value={password} onChange={e => setPassword(e.target.value)} />
+          </div>
+          <div>
+            <label className="font-body text-[10px] tracking-[0.3em] text-muted-foreground">CONFIRMAÇÃO DE SENHA</label>
+            <input type="password" required minLength={6} className="measure-input w-full mt-1" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
           </div>
           <button
             type="submit"
