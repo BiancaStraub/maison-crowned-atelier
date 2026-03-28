@@ -17,18 +17,18 @@ const Footer = () => {
         <div className="flex flex-col gap-2">
           <span className="font-body text-[10px] tracking-[0.3em] text-muted-foreground">CONTATO</span>
           <span className="font-body text-[10px] tracking-[0.2em] text-foreground/50">ATELIER@MAISONCROWNED.COM</span>
+          <Link
+            to="/admin"
+            className="mt-1 font-body text-[8px] tracking-[0.2em] text-muted-foreground/30 gold-hover transition-colors"
+          >
+            ACESSO ADMINISTRATIVO
+          </Link>
         </div>
       </div>
       <div className="max-w-6xl mx-auto mt-16 pt-8 border-t border-border flex items-center justify-between">
         <p className="font-body text-[9px] tracking-[0.2em] text-muted-foreground/50">
           © 2026 MAISON CROWNED. TODOS OS DIREITOS RESERVADOS.
         </p>
-        <Link
-          to="/admin"
-          className="font-body text-[8px] tracking-[0.2em] text-muted-foreground/30 gold-hover transition-colors"
-        >
-          ADMIN
-        </Link>
       </div>
     </footer>
   );
