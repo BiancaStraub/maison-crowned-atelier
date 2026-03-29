@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { getPersistedAuth, setPersistedAuth } from '@/lib/localStore';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,11 +10,19 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const auth = getPersistedAuth();
+    if (auth.isAuthenticated && auth.role === 'client') {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
       if (email === 'cliente@maisoncrowned.com' && password === 'cliente123') {
+        setPersistedAuth({ isAuthenticated: true, role: 'client', email });
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('userEmail', email);
         toast.success('Bem-vindo à Maison Crowned');
