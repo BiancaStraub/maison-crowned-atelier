@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Product } from '@/data/products';
+import { getPersistedCart, setPersistedCart } from '@/lib/localStore';
 
 export interface CartItem {
   product: Product;
@@ -7,19 +8,12 @@ export interface CartItem {
   measurements?: Record<string, string>;
 }
 
-const CART_KEY = 'maison-crowned-cart';
-
 function loadCart(): CartItem[] {
-  try {
-    const raw = localStorage.getItem(CART_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+  return getPersistedCart<CartItem>();
 }
 
 function saveCart(items: CartItem[]) {
-  localStorage.setItem(CART_KEY, JSON.stringify(items));
+  setPersistedCart(items);
 }
 
 export function useCart() {
