@@ -6,6 +6,7 @@ import { useCartContext } from '@/contexts/CartContext';
 import MeasurementForm from '@/components/MeasurementForm';
 import ProductReviews from '@/components/ProductReviews';
 import { toast } from 'sonner';
+import { appendPersistedMeasurement, getPersistedAuth } from '@/lib/localStore';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -47,6 +48,21 @@ const ProductDetail = () => {
   const viewChars = [product.name.charAt(0), product.name.charAt(1) || 'B', '✦', '◈'];
 
   const handleMeasurements = (measurements: Record<string, string>) => {
+    const auth = getPersistedAuth();
+    appendPersistedMeasurement({
+      id: crypto.randomUUID(),
+      label: `Medidas ${product.name}`,
+      user_email: auth.email || 'cliente@maisoncrowned.com',
+      busto: measurements.torax || null,
+      cintura: measurements.cintura || null,
+      quadril: measurements.quadril || null,
+      pescoco: measurements.pescoco || null,
+      ombro: measurements.ombro || null,
+      manga: measurements.manga || null,
+      altura: measurements.altura || null,
+      created_at: new Date().toISOString(),
+    });
+
     setSavedMeasurements(measurements);
     toast.success('Medidas registradas com sucesso', { description: 'Suas medidas foram salvas para esta peça.' });
     setShowMeasurements(false);

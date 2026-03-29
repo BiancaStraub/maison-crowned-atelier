@@ -2,15 +2,16 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCartContext } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+import { STORAGE_KEYS, clearPersistedAuth, getPersistedAuth, subscribeStorage } from '@/lib/localStore';
 
 const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [auth, setAuth] = useState(() => getPersistedAuth());
   const navigate = useNavigate();
   const location = useLocation();
   const { count } = useCartContext();
-  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
@@ -18,10 +19,33 @@ const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    setAuth(getPersistedAuth());
+    const unsubscribe = subscribeStorage(STORAGE_KEYS.auth, () => {
+      setAuth(getPersistedAuth());
+    });
+
+    return unsubscribe;
+  }, []);
+
   const go = (path: string) => {
     navigate(path);
     setMenuOpen(false);
   };
+
+  const handleLogout = () => {
+    clearPersistedAuth();
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userEmail');
+    toast.success('Sessão encerrada');
+    go('/');
+  };
+
+  const accountPath = auth.isAuthenticated
+    ? auth.role === 'admin'
+      ? '/admin'
+      : '/dashboard'
+    : '/login';
 
   return (
     <>
@@ -38,10 +62,10 @@ const Navigation = () => {
         <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
           {/* Left: User icon / Login */}
           <button
-            onClick={() => go(user ? '/dashboard' : '/login')}
+            onClick={() => go(accountPath)}
             className="font-body text-[10px] tracking-[0.3em] text-foreground/60 gold-hover"
           >
-            {user ? 'CONTA' : 'LOGIN'}
+            {auth.isAuthenticated ? 'CONTA' : 'LOGIN'}
           </button>
 
           {/* Center: Brand */}
@@ -53,17 +77,28 @@ const Navigation = () => {
           </button>
 
           {/* Right: Cart */}
-          <button
-            onClick={() => go('/carrinho')}
-            className="font-body text-[10px] tracking-[0.3em] text-foreground/60 gold-hover relative"
-          >
-            CART
-            {count > 0 && (
-              <span className="absolute -top-1 -right-4 w-4 h-4 bg-gold text-primary-foreground text-[8px] flex items-center justify-center">
-                {count}
-              </span>
+          <div className="flex items-center gap-5">
+            <button
+              onClick={() => go('/carrinho')}
+              className="font-body text-[10px] tracking-[0.3em] text-foreground/60 gold-hover relative"
+            >
+              CART
+              {count > 0 && (
+                <span className="absolute -top-1 -right-4 w-4 h-4 bg-gold text-primary-foreground text-[8px] flex items-center justify-center">
+                  {count}
+                </span>
+              )}
+            </button>
+
+            {auth.isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                className="font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover"
+              >
+                SAIR
+              </button>
             )}
-          </button>
+          </div>
         </div>
 
         <AnimatePresence>

@@ -6,6 +6,18 @@ import { useCartContext } from '@/contexts/CartContext';
 import Footer from '@/components/Footer';
 import ProductReviews from '@/components/ProductReviews';
 import { toast } from 'sonner';
+import {
+  STORAGE_KEYS,
+  appendPersistedMeasurement,
+  clearPersistedAuth,
+  getPersistedAuth,
+  getPersistedMeasurements,
+  getPersistedOrders,
+  setPersistedMeasurements,
+  subscribeStorage,
+  type PersistedMeasurement,
+  type PersistedOrder,
+} from '@/lib/localStore';
 
 const ORDER_STATUSES = ['Em Medição', 'Corte e Costura', 'Controle de Qualidade', 'Enviado', 'Entregue'];
 
@@ -43,13 +55,13 @@ interface Address {
 }
 
 const Dashboard = () => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  const userEmail = localStorage.getItem('userEmail') || 'cliente@maisoncrowned.com';
   const navigate = useNavigate();
+  const [auth, setAuth] = useState(() => getPersistedAuth());
+  const userEmail = auth.email || 'cliente@maisoncrowned.com';
   const { items, removeItem, updateQuantity, total } = useCartContext();
   const [tab, setTab] = useState<Tab>('pedidos');
-  const [orders] = useState<Order[]>([]);
-  const [measurements, setMeasurements] = useState<Measurement[]>([]);
+  const [orders, setOrders] = useState<PersistedOrder[]>([]);
+  const [measurements, setMeasurements] = useState<PersistedMeasurement[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -64,10 +76,41 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    if (!isAuthenticated) { navigate('/login'); }
-  }, [isAuthenticated]);
+    const refreshAuth = () => setAuth(getPersistedAuth());
+    const refreshOrders = () => {
+      const email = getPersistedAuth().email;
+      const clientOrders = getPersistedOrders().filter(order => order.user_email === email);
+      setOrders(clientOrders);
+    };
+    const refreshMeasurements = () => {
+      const email = getPersistedAuth().email;
+      const clientMeasurements = getPersistedMeasurements().filter(measurement => measurement.user_email === email);
+      setMeasurements(clientMeasurements);
+    };
+
+    refreshAuth();
+    refreshOrders();
+    refreshMeasurements();
+
+    const unsubAuth = subscribeStorage(STORAGE_KEYS.auth, refreshAuth);
+    const unsubOrders = subscribeStorage(STORAGE_KEYS.orders, refreshOrders);
+    const unsubMeasurements = subscribeStorage(STORAGE_KEYS.measurements, refreshMeasurements);
+
+    return () => {
+      unsubAuth();
+      unsubOrders();
+      unsubMeasurements();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!auth.isAuthenticated || auth.role !== 'client') {
+      navigate('/login');
+    }
+  }, [auth, navigate]);
 
   const handleSignOut = () => {
+    clearPersistedAuth();
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userEmail');
     toast.success('Até logo!');
@@ -76,14 +119,29 @@ const Dashboard = () => {
 
   const saveMeasurement = () => {
     if (!newMeasurement.label) { toast.error('Dê um nome ao perfil de medidas'); return; }
-    const entry: Measurement = { id: crypto.randomUUID(), ...newMeasurement };
-    setMeasurements(prev => [entry, ...prev]);
+    const entry: PersistedMeasurement = {
+      id: crypto.randomUUID(),
+      label: newMeasurement.label,
+      user_email: userEmail,
+      busto: newMeasurement.busto || null,
+      cintura: newMeasurement.cintura || null,
+      quadril: newMeasurement.quadril || null,
+      pescoco: newMeasurement.pescoco || null,
+      ombro: newMeasurement.ombro || null,
+      manga: newMeasurement.manga || null,
+      altura: newMeasurement.altura || null,
+      created_at: new Date().toISOString(),
+    };
+    const next = appendPersistedMeasurement(entry).filter(m => m.user_email === userEmail);
+    setMeasurements(next);
     toast.success('Medidas salvas!');
     setNewMeasurement({ label: '', busto: '', cintura: '', quadril: '', pescoco: '', ombro: '', manga: '', altura: '' });
   };
 
   const deleteMeasurement = (id: string) => {
-    setMeasurements(prev => prev.filter(m => m.id !== id));
+    const allMeasurements = getPersistedMeasurements().filter(measurement => measurement.id !== id);
+    setPersistedMeasurements(allMeasurements);
+    setMeasurements(allMeasurements.filter(measurement => measurement.user_email === userEmail));
     toast.success('Medidas removidas');
   };
 

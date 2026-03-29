@@ -5,6 +5,7 @@ import { useCartContext } from '@/contexts/CartContext';
 import { formatPrice } from '@/data/products';
 import Footer from '@/components/Footer';
 import { toast } from 'sonner';
+import { appendPersistedOrder, getPersistedAuth } from '@/lib/localStore';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -15,6 +16,22 @@ const Cart = () => {
   });
 
   const handleCheckout = () => {
+    const auth = getPersistedAuth();
+    appendPersistedOrder({
+      id: crypto.randomUUID(),
+      status: 'Em Medição',
+      total,
+      created_at: new Date().toISOString(),
+      shipping_name: shipping.name || null,
+      user_email: auth.email || 'cliente@maisoncrowned.com',
+      order_items: items.map(item => ({
+        product_id: item.product.id,
+        product_name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+      })),
+    });
+
     toast.success('Pedido confirmado!', {
       description: 'Você receberá um e-mail de confirmação com o rastreamento DHL Express.',
     });
