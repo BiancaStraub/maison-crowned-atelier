@@ -43,14 +43,15 @@ interface Address {
 }
 
 const Dashboard = () => {
-  const { user, loading: authLoading } = useAuth();
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  const userEmail = localStorage.getItem('userEmail') || 'cliente@maisoncrowned.com';
   const navigate = useNavigate();
   const { items, removeItem, updateQuantity, total } = useCartContext();
   const [tab, setTab] = useState<Tab>('pedidos');
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders] = useState<Order[]>([]);
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // New measurement form
   const [newMeasurement, setNewMeasurement] = useState({
@@ -63,54 +64,38 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    if (!authLoading && !user) { navigate('/login'); return; }
-    if (user) fetchAll();
-  }, [user, authLoading]);
+    if (!isAuthenticated) { navigate('/login'); }
+  }, [isAuthenticated]);
 
-  const fetchAll = async () => {
-    const [ordersRes, measRes, addrRes] = await Promise.all([
-      supabase.from('orders').select('*, order_items(product_name, price, product_id)').eq('user_id', user!.id).order('created_at', { ascending: false }),
-      supabase.from('measurements').select('*').eq('user_id', user!.id).order('created_at', { ascending: false }),
-      supabase.from('addresses').select('*').eq('user_id', user!.id).order('created_at', { ascending: false }),
-    ]);
-    setOrders((ordersRes.data as Order[]) || []);
-    setMeasurements((measRes.data as Measurement[]) || []);
-    setAddresses((addrRes.data as Address[]) || []);
-    setLoading(false);
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
+  const handleSignOut = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userEmail');
     toast.success('Até logo!');
     navigate('/');
   };
 
-  const saveMeasurement = async () => {
+  const saveMeasurement = () => {
     if (!newMeasurement.label) { toast.error('Dê um nome ao perfil de medidas'); return; }
-    const { error } = await supabase.from('measurements').insert([{ ...newMeasurement, user_id: user!.id }]);
-    if (error) { toast.error('Erro ao salvar medidas'); return; }
+    const entry: Measurement = { id: crypto.randomUUID(), ...newMeasurement };
+    setMeasurements(prev => [entry, ...prev]);
     toast.success('Medidas salvas!');
     setNewMeasurement({ label: '', busto: '', cintura: '', quadril: '', pescoco: '', ombro: '', manga: '', altura: '' });
-    fetchAll();
   };
 
-  const deleteMeasurement = async (id: string) => {
-    await supabase.from('measurements').delete().eq('id', id);
+  const deleteMeasurement = (id: string) => {
     setMeasurements(prev => prev.filter(m => m.id !== id));
     toast.success('Medidas removidas');
   };
 
-  const saveAddress = async () => {
+  const saveAddress = () => {
     if (!newAddress.street || !newAddress.city) { toast.error('Preencha os campos obrigatórios'); return; }
-    const { error } = await supabase.from('addresses').insert([{ ...newAddress, user_id: user!.id }]);
-    if (error) { toast.error('Erro ao salvar endereço'); return; }
+    const entry: Address = { id: crypto.randomUUID(), ...newAddress };
+    setAddresses(prev => [entry, ...prev]);
     toast.success('Endereço salvo!');
     setNewAddress({ label: 'Principal', street: '', city: '', state: '', zip: '', country: 'Brasil' });
-    fetchAll();
   };
 
-  const deleteAddress = async (id: string) => {
-    await supabase.from('addresses').delete().eq('id', id);
+  const deleteAddress = (id: string) => {
     setAddresses(prev => prev.filter(a => a.id !== id));
     toast.success('Endereço removido');
   };
