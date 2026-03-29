@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/products';
 import Footer from '@/components/Footer';
@@ -21,24 +20,41 @@ interface Expense { id: string; description: string; amount: number; category: s
 interface ClientMeasurement { id: string; user_id: string; label: string; busto: string | null; cintura: string | null; quadril: string | null; pescoco: string | null; ombro: string | null; manga: string | null; altura: string | null; }
 
 const Admin = () => {
-  const { user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [adminAuthenticated, setAdminAuthenticated] = useState(false);
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [tab, setTab] = useState<Tab>('financeiro');
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [clientMeasurements, setClientMeasurements] = useState<ClientMeasurement[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [newSupplier, setNewSupplier] = useState({ name: '', fabric_type: '', contact: '', cnpj: '', email: '', telefone: '' });
   const [newEmployee, setNewEmployee] = useState({ nome: '', cargo: '', cpf: '' });
   const [newExpense, setNewExpense] = useState({ description: '', amount: '', category: 'Geral' });
 
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAdminLoginLoading(true);
+    setTimeout(() => {
+      if (adminEmail === 'admin@maisoncrowned.com' && adminPassword === 'admin123') {
+        setAdminAuthenticated(true);
+        toast.success('Acesso de Administrador Autorizado');
+        fetchData();
+      } else {
+        toast.error('Credenciais inválidas. Acesso negado.');
+      }
+      setAdminLoginLoading(false);
+    }, 500);
+  };
+
   useEffect(() => {
-    if (!authLoading && (!user || !isAdmin)) { navigate('/'); return; }
-    if (user && isAdmin) fetchData();
-  }, [user, isAdmin, authLoading]);
+    // no-op: data loaded after admin login
+  }, []);
 
   const fetchData = async () => {
     const [ordersRes, suppliersRes, employeesRes, expensesRes, measRes] = await Promise.all([
