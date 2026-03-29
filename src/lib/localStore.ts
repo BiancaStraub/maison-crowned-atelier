@@ -152,4 +152,5 @@ export function getPersistedCart<T>(): T[] {
 export function setPersistedCart<T>(items: T[]) {
   localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(items));
   localStorage.removeItem(LEGACY_CART_KEY);
+  emitStorageSync(STORAGE_KEYS.cart);
 }
