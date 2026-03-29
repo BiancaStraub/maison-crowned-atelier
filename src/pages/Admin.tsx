@@ -5,23 +5,37 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/data/products';
 import Footer from '@/components/Footer';
 import { toast } from 'sonner';
+import {
+  STORAGE_KEYS,
+  getPersistedAuth,
+  getPersistedMeasurements,
+  getPersistedOrders,
+  setPersistedAuth,
+  setPersistedOrders,
+  subscribeStorage,
+  type PersistedMeasurement,
+  type PersistedOrder,
+} from '@/lib/localStore';
 
 const ORDER_STATUSES = ['Em Medição', 'Corte e Costura', 'Controle de Qualidade', 'Enviado', 'Entregue'];
 
 type Tab = 'financeiro' | 'pedidos' | 'fornecedores' | 'funcionarios' | 'producao' | 'medidas';
 
 interface AdminOrder {
-  id: string; status: string; total: number; created_at: string; shipping_name: string | null; user_id: string;
+  id: string; status: string; total: number; created_at: string; shipping_name: string | null; user_email: string;
   order_items: { product_name: string; price: number }[];
 }
 interface Supplier { id: string; name: string; fabric_type: string; contact: string | null; cnpj: string | null; email: string | null; telefone: string | null; }
 interface Employee { id: string; nome: string; cargo: string; cpf: string | null; }
 interface Expense { id: string; description: string; amount: number; category: string; created_at: string; }
-interface ClientMeasurement { id: string; user_id: string; label: string; busto: string | null; cintura: string | null; quadril: string | null; pescoco: string | null; ombro: string | null; manga: string | null; altura: string | null; }
+interface ClientMeasurement { id: string; user_email: string; label: string; busto: string | null; cintura: string | null; quadril: string | null; pescoco: string | null; ombro: string | null; manga: string | null; altura: string | null; }
 
 const Admin = () => {
   const navigate = useNavigate();
-  const [adminAuthenticated, setAdminAuthenticated] = useState(false);
+  const [adminAuthenticated, setAdminAuthenticated] = useState(() => {
+    const auth = getPersistedAuth();
+    return auth.isAuthenticated && auth.role === 'admin';
+  });
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
@@ -42,6 +56,9 @@ const Admin = () => {
     setAdminLoginLoading(true);
     setTimeout(() => {
       if (adminEmail === 'admin@maisoncrowned.com' && adminPassword === 'admin123') {
+        setPersistedAuth({ isAuthenticated: true, role: 'admin', email: adminEmail });
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userEmail', adminEmail);
         setAdminAuthenticated(true);
         toast.success('Acesso de Administrador Autorizado');
         fetchData();
@@ -53,30 +70,46 @@ const Admin = () => {
   };
 
   useEffect(() => {
-    // no-op: data loaded after admin login
-  }, []);
+    if (!adminAuthenticated) return;
+
+    fetchData();
+    const unsubscribeOrders = subscribeStorage(STORAGE_KEYS.orders, () => {
+      setOrders(getPersistedOrders() as AdminOrder[]);
+    });
+    const unsubscribeMeasurements = subscribeStorage(STORAGE_KEYS.measurements, () => {
+      setClientMeasurements(getPersistedMeasurements() as ClientMeasurement[]);
+    });
+
+    return () => {
+      unsubscribeOrders();
+      unsubscribeMeasurements();
+    };
+  }, [adminAuthenticated]);
 
   const fetchData = async () => {
-    const [ordersRes, suppliersRes, employeesRes, expensesRes, measRes] = await Promise.all([
-      supabase.from('orders').select('*, order_items(product_name, price)').order('created_at', { ascending: false }),
+    setLoading(true);
+    const [suppliersRes, employeesRes, expensesRes] = await Promise.all([
       supabase.from('suppliers').select('*').order('name'),
       supabase.from('employees').select('*').order('nome'),
       supabase.from('expenses').select('*').order('created_at', { ascending: false }),
-      supabase.from('measurements').select('*').order('created_at', { ascending: false }),
     ]);
-    setOrders((ordersRes.data as AdminOrder[]) || []);
+
+    setOrders(getPersistedOrders() as AdminOrder[]);
     setSuppliers((suppliersRes.data as Supplier[]) || []);
     setEmployees((employeesRes.data as Employee[]) || []);
     setExpenses((expensesRes.data as Expense[]) || []);
-    setClientMeasurements((measRes.data as ClientMeasurement[]) || []);
+    setClientMeasurements(getPersistedMeasurements() as ClientMeasurement[]);
     setLoading(false);
   };
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
-    const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
-    if (error) { toast.error('Erro ao atualizar'); return; }
+  const updateOrderStatus = (orderId: string, newStatus: string) => {
+    const updatedOrders = orders.map(order => (
+      order.id === orderId ? { ...order, status: newStatus } : order
+    ));
+
+    setPersistedOrders(updatedOrders as PersistedOrder[]);
+    setOrders(updatedOrders);
     toast.success('Status atualizado');
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
   };
 
   const addSupplier = async () => {
@@ -428,6 +461,7 @@ const Admin = () => {
                     {clientMeasurements.map(m => (
                       <tr key={m.id} className="border-b border-border/50">
                         <td className="py-3 font-body text-[10px] text-foreground/60">{m.user_id.slice(0, 8)}</td>
+                        <td className="py-3 font-body text-[10px] text-foreground/60">{m.user_email || 'cliente@maisoncrowned.com'}</td>
                         <td className="py-3 font-body text-sm text-gold">{m.label}</td>
                         <td className="py-3 font-body text-sm text-foreground/60">{m.busto || '—'}</td>
                         <td className="py-3 font-body text-sm text-foreground/60">{m.cintura || '—'}</td>
