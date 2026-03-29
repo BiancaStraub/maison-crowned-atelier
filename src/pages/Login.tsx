@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { signIn } from '@/lib/auth';
 import { toast } from 'sonner';
 
 const Login = () => {
@@ -10,17 +9,17 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signIn(email, password);
-    setLoading(false);
-    if (error) {
-      toast.error('Erro ao entrar', { description: error.message });
-    } else {
+    // Mock authentication — accept any email/password for demo
+    setTimeout(() => {
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('userEmail', email);
       toast.success('Bem-vindo de volta!');
       navigate('/dashboard');
-    }
+      setLoading(false);
+    }, 600);
   };
 
   return (

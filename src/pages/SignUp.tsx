@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { signUp } from '@/lib/auth';
 import { toast } from 'sonner';
 
 const SignUp = () => {
@@ -21,7 +20,7 @@ const SignUp = () => {
       .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (password.length < 6) {
       toast.error('A senha deve ter pelo menos 6 caracteres');
@@ -32,14 +31,12 @@ const SignUp = () => {
       return;
     }
     setLoading(true);
-    const { error } = await signUp(email, password, fullName, cpf.replace(/\D/g, ''));
-    setLoading(false);
-    if (error) {
-      toast.error('Erro ao criar conta', { description: error.message });
-    } else {
-      toast.success('Conta criada com sucesso!', { description: 'Faça login para continuar.' });
+    // Mock registration — redirect to login
+    setTimeout(() => {
+      toast.success('Cadastro realizado com sucesso!', { description: 'Faça login para continuar.' });
       navigate('/login');
-    }
+      setLoading(false);
+    }, 600);
   };
 
   return (
