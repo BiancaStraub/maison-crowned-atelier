@@ -31,9 +31,8 @@ const SignUp = () => {
       return;
     }
     setLoading(true);
-    // Mock registration — redirect to login
     setTimeout(() => {
-      toast.success('Cadastro realizado com sucesso!', { description: 'Faça login para continuar.' });
+      toast.success('Cadastro realizado com sucesso!', { description: 'Faça seu login.' });
       navigate('/login');
       setLoading(false);
     }, 600);

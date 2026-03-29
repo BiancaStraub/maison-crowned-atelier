@@ -12,12 +12,15 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Mock authentication — accept any email/password for demo
     setTimeout(() => {
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userEmail', email);
-      toast.success('Bem-vindo de volta!');
-      navigate('/dashboard');
+      if (email === 'cliente@maisoncrowned.com' && password === 'cliente123') {
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userEmail', email);
+        toast.success('Bem-vindo à Maison Crowned');
+        navigate('/dashboard');
+      } else {
+        toast.error('E-mail ou senha incorretos.');
+      }
       setLoading(false);
     }, 600);
   };
@@ -51,7 +54,11 @@ const Login = () => {
           </button>
         </form>
 
-        <p className="mt-8 text-center font-body text-[10px] tracking-[0.2em] text-muted-foreground">
+        <p className="mt-4 text-center font-body text-[9px] tracking-[0.15em] text-muted-foreground/50">
+          Teste Cliente: cliente@maisoncrowned.com / cliente123
+        </p>
+
+        <p className="mt-6 text-center font-body text-[10px] tracking-[0.2em] text-muted-foreground">
           NÃO TEM CONTA?{' '}
           <Link to="/signup" className="text-gold gold-hover">CRIAR CONTA</Link>
         </p>
