@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { signOut } from '@/lib/auth';
 import { formatPrice } from '@/data/products';
 import { useCartContext } from '@/contexts/CartContext';
 import Footer from '@/components/Footer';
