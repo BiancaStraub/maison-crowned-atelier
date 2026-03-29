@@ -460,7 +460,6 @@ const Admin = () => {
                   <tbody>
                     {clientMeasurements.map(m => (
                       <tr key={m.id} className="border-b border-border/50">
-                        <td className="py-3 font-body text-[10px] text-foreground/60">{m.user_id.slice(0, 8)}</td>
                         <td className="py-3 font-body text-[10px] text-foreground/60">{m.user_email || 'cliente@maisoncrowned.com'}</td>
                         <td className="py-3 font-body text-sm text-gold">{m.label}</td>
                         <td className="py-3 font-body text-sm text-foreground/60">{m.busto || '—'}</td>
