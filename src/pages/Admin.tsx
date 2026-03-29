@@ -125,7 +125,52 @@ const Admin = () => {
   const toDo = orders.filter(o => ['Em Medição', 'Corte e Costura', 'Controle de Qualidade'].includes(o.status));
   const toShip = orders.filter(o => o.status === 'Enviado');
 
-  if (authLoading || loading) {
+  if (!adminAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="w-full max-w-md"
+        >
+          <h1 className="font-heading text-4xl tracking-[0.2em] text-foreground text-center">ADMIN LOGIN</h1>
+          <div className="mt-4 w-12 h-px bg-gold mx-auto" />
+
+          <form onSubmit={handleAdminLogin} className="mt-12 flex flex-col gap-6">
+            <div>
+              <label className="font-body text-[10px] tracking-[0.3em] text-muted-foreground">E-MAIL</label>
+              <input type="email" required className="measure-input w-full mt-1" value={adminEmail} onChange={e => setAdminEmail(e.target.value)} />
+            </div>
+            <div>
+              <label className="font-body text-[10px] tracking-[0.3em] text-muted-foreground">SENHA</label>
+              <input type="password" required className="measure-input w-full mt-1" value={adminPassword} onChange={e => setAdminPassword(e.target.value)} />
+            </div>
+            <button
+              type="submit"
+              disabled={adminLoginLoading}
+              className="mt-4 font-body text-xs tracking-[0.3em] text-primary-foreground bg-gold px-10 py-3 transition-opacity hover:opacity-80 disabled:opacity-50"
+            >
+              {adminLoginLoading ? 'VERIFICANDO...' : 'ENTRAR'}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center font-body text-[9px] tracking-[0.2em] text-muted-foreground/40">
+            Teste: admin@maisoncrowned.com / admin123
+          </p>
+
+          <button
+            onClick={() => navigate('/')}
+            className="mt-8 block mx-auto font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover"
+          >
+            ← VOLTAR
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="font-body text-sm text-muted-foreground tracking-[0.2em] animate-pulse">CARREGANDO...</p>
