@@ -106,7 +106,7 @@ const Dashboard = () => {
     .flatMap(o => o.order_items.map(i => i.product_id));
   const uniqueDeliveredProducts = [...new Set(deliveredProducts)];
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="font-body text-sm text-muted-foreground tracking-[0.2em] animate-pulse">CARREGANDO...</p>
@@ -138,7 +138,7 @@ const Dashboard = () => {
           </div>
           <button onClick={handleSignOut} className="font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover">SAIR</button>
         </div>
-        <p className="mt-6 font-body text-xs tracking-[0.2em] text-muted-foreground">{user?.email}</p>
+        <p className="mt-6 font-body text-xs tracking-[0.2em] text-muted-foreground">{userEmail}</p>
 
         {/* Tabs */}
         <div className="mt-12 flex gap-6 border-b border-border overflow-x-auto">
