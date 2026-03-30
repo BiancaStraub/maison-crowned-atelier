@@ -88,11 +88,20 @@ const ProductDetail = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.98 }}
                     transition={{ duration: 0.5 }}
-                    className={`w-64 h-[360px] md:w-80 md:h-[460px] bg-gradient-to-b ${getGradient(product.color)} flex items-center justify-center`}
+                    className={`w-64 h-[360px] md:w-80 md:h-[460px] relative overflow-hidden bg-gradient-to-b ${getGradient(product.color)}`}
                   >
-                    <span className="font-heading text-7xl tracking-[0.1em] text-foreground/8 select-none">
-                      {viewChars[activeView]}
-                    </span>
+                    {!imgError[product.images[viewKeys[activeView]]] ? (
+                      <img
+                        src={product.images[viewKeys[activeView]]}
+                        alt={`${product.name} ${views[activeView]}`}
+                        onError={() => setImgError(prev => ({ ...prev, [product.images[viewKeys[activeView]]]: true }))}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="absolute inset-0 flex items-center justify-center font-heading text-7xl tracking-[0.1em] text-foreground/8 select-none">
+                        {product.name.charAt(0)}
+                      </span>
+                    )}
                   </motion.div>
                 </AnimatePresence>
 
@@ -102,11 +111,20 @@ const ProductDetail = () => {
                     <button
                       key={view}
                       onClick={() => setActiveView(idx)}
-                      className={`w-14 h-14 md:w-16 md:h-16 bg-gradient-to-b ${getGradient(product.color)} flex items-center justify-center transition-all border-2 ${
+                      className={`w-14 h-14 md:w-16 md:h-16 relative overflow-hidden bg-gradient-to-b ${getGradient(product.color)} transition-all border-2 ${
                         activeView === idx ? 'border-gold opacity-100' : 'border-transparent opacity-50 hover:opacity-75'
                       }`}
                     >
-                      <span className="font-heading text-lg text-foreground/10 select-none">{viewChars[idx]}</span>
+                      {!imgError[product.images[viewKeys[idx]]] ? (
+                        <img
+                          src={product.images[viewKeys[idx]]}
+                          alt={`${product.name} ${view}`}
+                          onError={() => setImgError(prev => ({ ...prev, [product.images[viewKeys[idx]]]: true }))}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="absolute inset-0 flex items-center justify-center font-heading text-lg text-foreground/10 select-none">{product.name.charAt(0)}</span>
+                      )}
                     </button>
                   ))}
                 </div>
