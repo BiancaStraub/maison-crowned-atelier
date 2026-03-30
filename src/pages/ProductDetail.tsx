@@ -46,7 +46,6 @@ const ProductDetail = () => {
 
   const views = ['FRENTE', 'COSTAS', 'POSE', 'DETALHE'] as const;
   const viewKeys: (keyof typeof product.images)[] = ['front', 'back', 'pose', 'detail'];
-  const [imgError, setImgError] = useState<Record<string, boolean>>({});
 
   const handleMeasurements = (measurements: Record<string, string>) => {
     const auth = getPersistedAuth();
