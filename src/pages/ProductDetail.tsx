@@ -14,7 +14,8 @@ const ProductDetail = () => {
   const { addItem } = useCartContext();
   const [showMeasurements, setShowMeasurements] = useState(false);
   const [savedMeasurements, setSavedMeasurements] = useState<Record<string, string>>({});
-  const [activeView, setActiveView] = useState(0);
+  const [activeView, setActiveView] = useState(2); // default to pose
+  const [imgError, setImgError] = useState<Record<string, boolean>>({});
   const product = products.find(p => p.id === id);
 
   if (!product) {
