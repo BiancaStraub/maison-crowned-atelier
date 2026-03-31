@@ -26,7 +26,7 @@ const Login = () => {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('userEmail', email);
         toast.success('Bem-vindo à Maison Crowned');
-        navigate('/dashboard');
+        navigate('/');
       } else {
         toast.error('E-mail ou senha incorretos.');
       }
