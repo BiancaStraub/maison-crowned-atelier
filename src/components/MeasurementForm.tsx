@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 interface MeasurementFormProps {
   gender: 'masculina' | 'feminina';
@@ -23,8 +24,24 @@ const MeasurementForm = ({ gender, onSubmit }: MeasurementFormProps) => {
     setMeasurements(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = () => {
-    onSubmit(measurements);
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const hasMissingField = measurementFields.some(
+      field => !(measurements[field.key] ?? '').trim()
+    );
+
+    if (hasMissingField) {
+      toast.error('Por favor, preencha todas as medidas obrigatórias.');
+      return;
+    }
+
+    const normalizedMeasurements = measurementFields.reduce<Record<string, string>>((acc, field) => {
+      acc[field.key] = (measurements[field.key] ?? '').trim();
+      return acc;
+    }, {});
+
+    onSubmit(normalizedMeasurements);
   };
 
   return (
@@ -121,11 +138,12 @@ const MeasurementForm = ({ gender, onSubmit }: MeasurementFormProps) => {
       </motion.div>
 
       {/* Form inputs */}
-      <motion.div
+      <motion.form
         initial={{ opacity: 0, x: 30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
         className="w-full lg:w-1/2 flex flex-col gap-6"
+        onSubmit={handleSubmit}
       >
         <h3 className="font-heading text-2xl tracking-[0.15em] text-foreground mb-4">
           PERSONALIZAR MEDIDAS
@@ -151,6 +169,8 @@ const MeasurementForm = ({ gender, onSubmit }: MeasurementFormProps) => {
               placeholder="—"
               value={measurements[field.key] || ''}
               onChange={(e) => handleChange(field.key, e.target.value)}
+              required
+              aria-required="true"
             />
             <span className="font-body text-[10px] text-muted-foreground tracking-wider">
               {field.unit}
@@ -162,12 +182,12 @@ const MeasurementForm = ({ gender, onSubmit }: MeasurementFormProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          onClick={handleSubmit}
+          type="submit"
           className="mt-8 font-body text-xs tracking-[0.3em] text-foreground/70 border-b border-foreground/20 pb-2 self-start gold-hover transition-colors"
         >
-          CONFIRMAR MEDIDAS
+          SALVAR MEDIDAS
         </motion.button>
-      </motion.div>
+      </motion.form>
     </div>
   );
 };

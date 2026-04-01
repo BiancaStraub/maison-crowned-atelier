@@ -5,7 +5,7 @@ import { useCartContext } from '@/contexts/CartContext';
 import { formatPrice } from '@/data/products';
 import Footer from '@/components/Footer';
 import { toast } from 'sonner';
-import { appendPersistedOrder, getPersistedAuth } from '@/lib/localStore';
+import { appendPersistedOrder, getPersistedAuth, getPersistedMeasurements } from '@/lib/localStore';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -15,14 +15,58 @@ const Cart = () => {
     name: '', email: '', address: '', city: '', country: '', zip: '',
   });
 
+  const hasSavedMeasurements = () => {
+    const auth = getPersistedAuth();
+    const userEmail = auth.email || 'cliente@maisoncrowned.com';
+
+    return getPersistedMeasurements().some(measurement =>
+      measurement.user_email === userEmail &&
+      [
+        measurement.busto,
+        measurement.cintura,
+        measurement.quadril,
+        measurement.pescoco,
+        measurement.ombro,
+        measurement.manga,
+        measurement.altura,
+      ].every(value => typeof value === 'string' && value.trim().length > 0)
+    );
+  };
+
   const handleCheckout = () => {
+    if (!hasSavedMeasurements()) {
+      toast.error('Atenção: Você precisa cadastrar suas medidas no seu Painel antes de encomendar uma peça sob medida.');
+      return;
+    }
+
+    const requiredShippingValues = [
+      shipping.name,
+      shipping.email,
+      shipping.address,
+      shipping.city,
+      shipping.country,
+      shipping.zip,
+    ];
+
+    const hasMissingShippingField = requiredShippingValues.some(value => !value.trim());
+    if (hasMissingShippingField) {
+      toast.error('Preencha todos os campos obrigatórios de entrega para finalizar a compra.');
+      return;
+    }
+
+    const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shipping.email.trim());
+    if (!emailIsValid) {
+      toast.error('Informe um e-mail válido para finalizar a compra.');
+      return;
+    }
+
     const auth = getPersistedAuth();
     appendPersistedOrder({
       id: crypto.randomUUID(),
       status: 'Em Medição',
       total,
       created_at: new Date().toISOString(),
-      shipping_name: shipping.name || null,
+      shipping_name: shipping.name.trim() || null,
       user_email: auth.email || 'cliente@maisoncrowned.com',
       order_items: items.map(item => ({
         product_id: item.product.id,
@@ -145,6 +189,12 @@ const Cart = () => {
               >
                 FINALIZAR PEDIDO
               </button>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="font-body text-[10px] tracking-[0.25em] text-muted-foreground border-b border-border pb-1 gold-hover"
+              >
+                CADASTRAR MEDIDAS NO PAINEL
+              </button>
             </div>
           </>
         ) : (
@@ -181,10 +231,12 @@ const Cart = () => {
                     {field.label}
                   </label>
                   <input
-                    type="text"
+                    type={field.key === 'email' ? 'email' : 'text'}
                     className="measure-input w-full mt-1"
                     value={shipping[field.key as keyof typeof shipping]}
                     onChange={e => setShipping(prev => ({ ...prev, [field.key]: e.target.value }))}
+                    required
+                    aria-required="true"
                   />
                 </div>
               ))}
