@@ -61,12 +61,22 @@ const Navigation = () => {
       >
         <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
           {/* Left: User icon / Login */}
-          <button
-            onClick={() => go(accountPath)}
-            className="font-body text-[10px] tracking-[0.3em] text-foreground/60 gold-hover"
-          >
-            {auth.isAuthenticated ? 'CONTA' : 'LOGIN'}
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => go(accountPath)}
+              className="font-body text-[10px] tracking-[0.3em] text-foreground/60 gold-hover"
+            >
+              {auth.isAuthenticated ? 'CONTA' : 'LOGIN'}
+            </button>
+            {auth.isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                className="font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover"
+              >
+                SAIR
+              </button>
+            )}
+          </div>
 
           {/* Center: Brand */}
           <button
