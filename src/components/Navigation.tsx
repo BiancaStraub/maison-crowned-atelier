@@ -89,15 +89,6 @@ const Navigation = () => {
                 </span>
               )}
             </button>
-
-            {auth.isAuthenticated && (
-              <button
-                onClick={handleLogout}
-                className="font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover"
-              >
-                SAIR
-              </button>
-            )}
           </div>
         </div>
 
