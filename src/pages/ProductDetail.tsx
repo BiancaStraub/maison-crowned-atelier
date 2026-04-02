@@ -149,9 +149,9 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-16 lg:py-0">
+              <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 md:px-16 lg:px-24 pt-20 pb-16 lg:py-0 lg:pt-20">
                 <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-                  onClick={() => navigate(-1)} className="font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover mb-12 self-start">
+                  onClick={() => navigate(-1)} className="relative z-10 font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover mb-12 self-start">
                   ← VOLTAR
                 </motion.button>
 
