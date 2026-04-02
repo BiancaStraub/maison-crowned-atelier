@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import HeroSection from '@/components/HeroSection';
 import FabricsSection from '@/components/FabricsSection';
 import Footer from '@/components/Footer';
+import capaMasculino from '@/assets/capa-masculino.png';
+import capaFeminina from '@/assets/capa-feminina.png';
 
 const Index = () => {
   const navigate = useNavigate();
