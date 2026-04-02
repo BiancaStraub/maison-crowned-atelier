@@ -69,6 +69,12 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
+    const auth = getPersistedAuth();
+    if (!auth.isAuthenticated) {
+      toast.error('Você precisa fazer login como cliente para encomendar peças sob medida.');
+      navigate('/login');
+      return;
+    }
     addItem(product, Object.keys(savedMeasurements).length > 0 ? savedMeasurements : undefined);
     toast.success(`${product.name} adicionado ao carrinho`, { description: formatPrice(product.price) });
   };
