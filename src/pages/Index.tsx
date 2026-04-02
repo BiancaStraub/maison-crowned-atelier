@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import HeroSection from '@/components/HeroSection';
 import FabricsSection from '@/components/FabricsSection';
 import Footer from '@/components/Footer';
+import capaMasculino from '@/assets/capa-masculino.png';
+import capaFeminina from '@/assets/capa-feminina.png';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -30,8 +32,8 @@ const Index = () => {
       <section className="py-section px-6">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row gap-24 md:gap-0 justify-center items-center">
           {[
-            { label: 'COLEÇÃO MASCULINA', path: '/colecao/masculina' },
-            { label: 'COLEÇÃO FEMININA', path: '/colecao/feminina' },
+            { label: 'COLEÇÃO MASCULINA', path: '/colecao/masculina', img: capaMasculino },
+            { label: 'COLEÇÃO FEMININA', path: '/colecao/feminina', img: capaFeminina },
           ].map((col, i) => (
             <motion.button
               key={col.label}
@@ -42,10 +44,12 @@ const Index = () => {
               onClick={() => navigate(col.path)}
               className="flex-1 flex flex-col items-center gap-4 group"
             >
-              <div className="w-64 h-80 md:w-72 md:h-96 bg-secondary flex items-center justify-center transition-colors duration-500 group-hover:bg-muted">
-                <span className="font-heading text-7xl text-foreground/5 group-hover:text-gold/20 transition-colors duration-500">
-                  {i === 0 ? 'M' : 'F'}
-                </span>
+              <div className="w-64 h-80 md:w-72 md:h-96 overflow-hidden">
+                <img
+                  src={col.img}
+                  alt={col.label}
+                  className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                />
               </div>
               <span className="font-body text-[10px] tracking-[0.4em] text-muted-foreground group-hover:text-gold transition-colors duration-500">
                 {col.label}
