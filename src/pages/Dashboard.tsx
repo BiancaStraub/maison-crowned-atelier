@@ -153,7 +153,112 @@ const Dashboard = () => {
     toast.success('Medidas salvas!');
     setNewMeasurement({ label: '', busto: '', cintura: '', quadril: '', pescoco: '', ombro: '', manga: '', altura: '' });
   };
-...
+
+  const deleteMeasurement = (id: string) => {
+    const next = getPersistedMeasurements().filter(m => m.id !== id);
+    setPersistedMeasurements(next);
+    setMeasurements(next.filter(m => m.user_email === userEmail));
+    toast.success('Perfil de medidas removido.');
+  };
+
+  const saveAddress = () => {
+    if (!newAddress.street.trim() || !newAddress.city.trim() || !newAddress.state.trim() || !newAddress.zip.trim()) {
+      toast.error('Preencha todos os campos do endereço.');
+      return;
+    }
+    const entry: Address = { id: crypto.randomUUID(), ...newAddress };
+    setAddresses(prev => [entry, ...prev]);
+    toast.success('Endereço salvo!');
+    setNewAddress({ label: 'Principal', street: '', city: '', state: '', zip: '', country: 'Brasil' });
+  };
+
+  const deleteAddress = (id: string) => {
+    setAddresses(prev => prev.filter(a => a.id !== id));
+    toast.success('Endereço removido.');
+  };
+
+  const measureFields = [
+    { key: 'busto', label: 'BUSTO' },
+    { key: 'cintura', label: 'CINTURA' },
+    { key: 'quadril', label: 'QUADRIL' },
+    { key: 'pescoco', label: 'PESCOÇO' },
+    { key: 'ombro', label: 'OMBRO' },
+    { key: 'manga', label: 'MANGA' },
+    { key: 'altura', label: 'ALTURA' },
+  ];
+
+  const uniqueDeliveredProducts = Array.from(
+    new Set(
+      orders
+        .filter(o => o.status === 'Entregue')
+        .flatMap(o => o.order_items.map(i => i.product_id))
+    )
+  );
+
+  const tabs: { key: Tab; label: string }[] = [
+    { key: 'pedidos', label: 'PEDIDOS' },
+    { key: 'medidas', label: 'MEDIDAS' },
+    { key: 'carrinho', label: 'CARRINHO' },
+    { key: 'enderecos', label: 'ENDEREÇOS' },
+    { key: 'avaliacoes', label: 'AVALIAÇÕES' },
+  ];
+
+  const getStatusIndex = (status: string) => ORDER_STATUSES.indexOf(status);
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Header */}
+      <div className="max-w-5xl mx-auto px-6 pt-20 pb-8 flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-2xl tracking-[0.3em] text-foreground">MEU PAINEL</h1>
+          <p className="font-body text-[10px] tracking-[0.2em] text-muted-foreground mt-1">{userEmail}</p>
+        </div>
+        <button onClick={handleSignOut} className="font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover">SAIR</button>
+      </div>
+
+      {/* Tabs */}
+      <div className="max-w-5xl mx-auto px-6">
+        <div className="flex gap-6 border-b border-border pb-2">
+          {tabs.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)} className={`font-body text-[10px] tracking-[0.3em] pb-2 transition-colors ${tab === t.key ? 'text-gold border-b border-gold' : 'text-muted-foreground gold-hover'}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* PEDIDOS */}
+        {tab === 'pedidos' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8">
+            {orders.length === 0 ? (
+              <p className="font-body text-sm text-muted-foreground tracking-[0.15em]">Nenhum pedido encontrado.</p>
+            ) : (
+              <div className="flex flex-col gap-6">
+                {orders.map(order => (
+                  <div key={order.id} className="border border-border p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="font-body text-[10px] tracking-[0.2em] text-muted-foreground">#{order.id.slice(0, 8).toUpperCase()}</span>
+                      <span className="font-body text-[10px] tracking-[0.2em] text-gold">{order.status}</span>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="flex gap-1 mb-4">
+                      {ORDER_STATUSES.map((s, i) => (
+                        <div key={s} className={`h-1 flex-1 ${i <= getStatusIndex(order.status) ? 'bg-gold' : 'bg-border'}`} />
+                      ))}
+                    </div>
+                    {order.order_items.map((item, idx) => (
+                      <p key={idx} className="font-body text-xs text-foreground">{item.product_name} — {formatPrice(item.price)}</p>
+                    ))}
+                    <p className="font-body text-[10px] text-muted-foreground mt-2">Total: {formatPrice(order.total)}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* MEDIDAS */}
+        {tab === 'medidas' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8">
             <div className="border border-border p-6 mb-8">
               <h3 className="font-body text-[10px] tracking-[0.3em] text-muted-foreground mb-4">NOVO PERFIL DE MEDIDAS</h3>
               <div className="mb-4">
