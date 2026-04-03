@@ -19,10 +19,10 @@ export interface Product {
 
 function makeMaleImages(id: string, slug: string): ProductImages {
   return {
-    front: `/produtos/${id}-${slug}-front.jpg`,
-    back: `/produtos/${id}-${slug}-back.jpg`,
-    pose: `/produtos/${id}-${slug}-pose.jpg`,
-    detail: `/produtos/${id}-${slug}-detail.jpg`,
+    front: `/produtos/${id}-${slug}-front.png`,
+    back: `/produtos/${id}-${slug}-back.png`,
+    pose: `/produtos/${id}-${slug}-pose.png`,
+    detail: `/produtos/${id}-${slug}-detail.png`,
   };
 }
 
