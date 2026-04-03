@@ -213,7 +213,7 @@ const Dashboard = () => {
           <h1 className="font-display text-2xl tracking-[0.3em] text-foreground">MEU PAINEL</h1>
           <p className="font-body text-[10px] tracking-[0.2em] text-muted-foreground mt-1">{userEmail}</p>
         </div>
-        <button onClick={handleSignOut} className="font-body text-[10px] tracking-[0.3em] text-muted-foreground gold-hover">SAIR</button>
+        
       </div>
 
       {/* Tabs */}
