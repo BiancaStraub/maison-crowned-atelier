@@ -15,6 +15,14 @@ const Cart = () => {
     name: '', email: '', address: '', city: '', country: '', zip: '',
   });
 
+  useEffect(() => {
+    const auth = getPersistedAuth();
+    if (auth.isAuthenticated && auth.role === 'admin') {
+      toast.error('Área restrita ao cliente. Redirecionando ao painel administrativo.');
+      navigate('/admin');
+    }
+  }, [navigate]);
+
   const hasSavedMeasurements = () => {
     const auth = getPersistedAuth();
     const userEmail = auth.email || 'cliente@maisoncrowned.com';
