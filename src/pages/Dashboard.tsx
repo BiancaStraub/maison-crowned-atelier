@@ -104,8 +104,11 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (!auth.isAuthenticated || auth.role !== 'client') {
+    if (!auth.isAuthenticated) {
       navigate('/login');
+    } else if (auth.role === 'admin') {
+      toast.error('Área restrita ao cliente. Redirecionando ao painel administrativo.');
+      navigate('/admin');
     }
   }, [auth, navigate]);
 

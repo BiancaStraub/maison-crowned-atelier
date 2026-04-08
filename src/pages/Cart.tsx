@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCartContext } from '@/contexts/CartContext';
@@ -14,6 +14,14 @@ const Cart = () => {
   const [shipping, setShipping] = useState({
     name: '', email: '', address: '', city: '', country: '', zip: '',
   });
+
+  useEffect(() => {
+    const auth = getPersistedAuth();
+    if (auth.isAuthenticated && auth.role === 'admin') {
+      toast.error('Área restrita ao cliente. Redirecionando ao painel administrativo.');
+      navigate('/admin');
+    }
+  }, [navigate]);
 
   const hasSavedMeasurements = () => {
     const auth = getPersistedAuth();
