@@ -36,6 +36,15 @@ const Admin = () => {
     const auth = getPersistedAuth();
     return auth.isAuthenticated && auth.role === 'admin';
   });
+
+  useEffect(() => {
+    const auth = getPersistedAuth();
+    if (auth.isAuthenticated && auth.role === 'client') {
+      toast.error('Acesso negado. Você precisa sair da conta de Cliente antes de entrar como Administrador.');
+      navigate('/');
+    }
+  }, [navigate]);
+
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
