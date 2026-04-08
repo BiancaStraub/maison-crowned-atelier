@@ -12,8 +12,13 @@ const Login = () => {
 
   useEffect(() => {
     const auth = getPersistedAuth();
-    if (auth.isAuthenticated && auth.role === 'client') {
-      navigate('/dashboard');
+    if (auth.isAuthenticated) {
+      if (auth.role === 'admin') {
+        toast.error('Você está logado como Administrador. Saia da conta para acessar a área do Cliente.');
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     }
   }, [navigate]);
 
